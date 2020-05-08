@@ -4,14 +4,22 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const MongoDBStore = require('connect-mongodb-session')(session);
+
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
-// Passport Config
+// Passport Config 
 require('./config/passport')(passport);
 
 // DB Config
 const db = require('./config/keys').mongoURI;
+const store = new MongoDBStore({
+  uri: db,
+  collection: 'sessions'
+});
 
 // Connect to MongoDB
 mongoose
@@ -21,6 +29,14 @@ mongoose
   )
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
+
+  app.use(cookieParser());
+  app.use(session({
+    secret: 'userData',
+    resave: false,
+    saveUninitialized: false,
+    store: store
+  }));
 
 // EJS
 app.use(expressLayouts);

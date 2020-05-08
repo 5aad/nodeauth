@@ -1,6 +1,4 @@
-
-                          //your name:your password @clustername    
-dbPassword = 'mongodb+srv://Saad:saad123@devconnector-4a3xi.mongodb.net/test?retryWrites=true&w=majority';
+ dbPassword = 'mongodb://localhost:27017/notest';
 
 module.exports = {
     mongoURI: dbPassword

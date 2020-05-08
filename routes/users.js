@@ -2,9 +2,12 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
+const connectionModel=require('../models/connectionSaved')
 // Load User model
 const User = require('../models/User');
 const { forwardAuthenticated } = require('../config/auth');
+
+
 
 // Login Page
 router.get('/login', forwardAuthenticated, (req, res) => res.render('login'));
@@ -77,7 +80,36 @@ router.post('/register', (req, res) => {
 });
 
 // Login
-router.post('/login', (req, res, next) => {
+router.post('/login', async (req, res, next) => {
+  
+  //const sessions= connectionModel.find(user=>user.passport.user===userid.id)
+  console.log(req.body.email)
+  let list={}
+  let userid= await User.find()
+  
+  //list=userid.pop()
+  let flag=false;
+  let user;
+  for(let i=0;i<userid.length;i++){
+    if(userid[i].email.toLowerCase()===req.body.email.toLowerCase()){
+      flag=true
+      user=userid[i]._id
+
+    }
+    //console.log(userid[i])
+    i++;
+  }
+  console.log(flag)
+  const session=await connectionModel.find()
+  console.log(session[1])
+  let sessionArr=[]
+  // for(let i=0;i<session.length;i++){
+  //   if(session[i].session.user===user){
+  //     sessionArr.push(session[i])
+  //   }
+  //   i++;
+  // }
+  console.log(sessionArr)
   passport.authenticate('local', {
     successRedirect: '/dashboard',
     failureRedirect: '/users/login',
@@ -91,5 +123,7 @@ router.get('/logout', (req, res) => {
   req.flash('success_msg', 'You are logged out');
   res.redirect('/users/login');
 });
+
+
 
 module.exports = router;
