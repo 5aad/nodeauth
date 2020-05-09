@@ -3,10 +3,7 @@ const mongoose = require("mongoose");
 const eventSchema = new mongoose.Schema({
   userID:{
     type:String,
-    require:true
-  },
-  userName:{
-    type:String
+    require: true
   },
   name: {
     type: String,

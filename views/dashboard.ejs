@@ -1,7 +1,6 @@
-<div class="d-flex justify-content-between py-3">
-<h3 class="mt-4">Dashboard</h3>
-
-<a href="/users/logout" class="btn btn-secondary">Logout</a>
+<div class="d-flex justify-content-between mt-3">
+  <h3 class="mt-4">Dashboard</h3>
+  <a href="/users/logout" class="btn btn-secondary">Logout</a>
 </div>
 <div class="">
   <!-- Button trigger modal -->
@@ -130,16 +129,26 @@
     </div>
   </div>
 
-  <% for(var i=0; i< events.length; i++) {%>
+
   <div class="row mt-3">
-    <div class="col-md-6">
+    <% for(var i=0; i< events.length; i++) {%>
+    <div class="col-md-6 col-sm-12">
+
+      <form method="POST" action="inviteevent">
         <div class="card">
-            <div class="card-body">
-              <h5><%= events[i].name %></h5>
-              <p><%= events[i].description %></p>
-              <p><%= events[i].date %></p>
-              <p><%= events[i].userName %></p>
-              <a
+          <div class="card-body">
+            <h5 name="name"><%= events[i].name %></h5>
+            <input name="senderid" value=<%= user._id %> hidden/>
+            <input name="sendername" value=<%= user.name %> hidden/>
+            <input name="eventId" value=<%= events[i]._id %> hidden/>
+            <input name="eventname" value=<%= events[i].name %> hidden/>
+            <p name="eventdescription"><%= events[i].description %></p>
+            <input name="description" value=<%= events[i].description %> hidden/>
+            <p name="date"><%= events[i].date %></p>
+      
+
+            <p name="userName"><%= events[i].userName %></p>
+            <a
               href="#"
               event-name="<%= events[i].name %>"
               event-description="<%= events[i].description %>"
@@ -154,65 +163,106 @@
               class="btn btn-danger btn-md waves-effect waves-light btn-delete"
               ><i class="far fa-trash-alt"></i
             ></a>
-            <button type="button" class="btn btn-primary">Share</button>
-              <div class="d-flex mt-3 justify-content-between">
-               
-                <select
-                  data-placeholder="Invite Users"
-                  multiple
-                  class="chosen-select"
-                  name="diet"
-                >
-                  <option value=""></option>
-                  <option>Meat</option>
-                  <option>Vegetarian</option>
-                  <option>Pescatarian</option>
-                  <option>Vegan</option>
-                </select>
-                <button type="button" class="btn btn-primary">Invite</button>
-              </div>
+
+            <div class="d-flex mt-3">
+              <select
+                data-placeholder="Selecr user"
+                multiple
+                class="chosen-select"
+                name="inviteUsers">
+                <option value=""></option>  
+                <% for(var j=0; j < users.length; j++ ) {%>
+                  <% if(user.name===users[j].name){ %> 
+                  <% } else{%>   
+                   <option><%= users[i].name %> </option>
+                   <% } %>
+                <% } %>
+              </select>
+              <button type="submit" class="btn btn-primary ml-3">Invite</button>
             </div>
           </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <h5>Sender Name</h5>
-                <p>Event name</p>
-                <p>Event description</p>
-                <p>date</p>
-                <button type="button" class="btn btn-success">Yes</button>
-                <button type="button" class="btn btn-primary">No</button>
-            </div>
-
         </div>
+      </form>
+    </div>
+    <% } %>
+
+    <div class="col-md-6 col-sm-12">
+      <form method="GET" action="/inviteview">
+        <% for(var i=0; i< request.length; i++) {%>
+        <h1>Invite Requests Sent</h1>
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <h5><%= request[i].recepientName %></h5>
+              <p>Event name <%= request[i].eventName %></p>
+              <p>Event description: <%= request[i].eventDesc %></p>
+              <p class="date">date <%= request[i].date %></p>
+              <p><%=request[i].accepted %></p>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      </form>
+
+      <form method="POST" action="/updateInvite">
+        <h1>Invites</h1>
+        <% for(var i=0; i < invites.length; i++) {%>
+        
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body">
+              <h5><%= invites[i].senderName %></h5>
+              <p>Event name <%= invites[i].eventName %></p>
+              <p>Event description: <%= invites[i].eventDesc %></p>
+              <p class="date">date <%= invites[i].date %></p>
+              <% if(invites[i].accepted==='') {%>
+              <a
+                href="/updateInvite/<%= invites[i].id %>"
+                class="btn btn-danger btn-md waves-effect waves-light btn-delete"
+                >YES</a
+              >
+              <a
+                href="/updateDecline/<%= invites[i].id %>"
+                class="btn btn-primary btn-md waves-effect waves-light btn-delete"
+                >NO</a
+              >
+              <% } else{%>
+              <p>Request <%= invites[i].accepted %></p>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      </form>
     </div>
   </div>
-
-  <% } %>
 </div>
 
 <script
   type="text/javascript"
   src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"
 ></script>
-
 <script src="https://cdn.rawgit.com/harvesthq/chosen/gh-pages/chosen.jquery.min.js"></script>
 <script>
   $(".chosen-select").chosen({
     no_results_text: "Oops, nothing found!",
   });
 
-  $(document).ready(function () {
-    $(".btn-edit").click(function (e) {
-      e.preventDefault();
-      var eventId = $(this).attr("event-id").toString();
-      var eventName = $(this).attr("event-name");
-      var eventDescription = $(this).attr("event-description");
-      console.log(eventName);
-      $('#modalupdateForm input[name="id"]').val(eventId);
-      $('#modalupdateForm input[name="name"]').val(eventName);
-      $('#modalupdateForm textarea[name="description"]').val(eventDescription);
-    });
+  $("p.date").each(function (index, element) {
+    var dt = $(element).text();
+
+    var newdt = moment(dt).format("MM-DD-YY HH:mm");
+    $(element).text(newdt);
+  });
+
+  $(".btn-edit").click(function (e) {
+    e.preventDefault();
+    var eventId = $(this).attr("event-id").toString();
+    var eventName = $(this).attr("event-name");
+    var eventDescription = $(this).attr("event-description");
+    console.log(eventName);
+    $('#modalupdateForm input[name="id"]').val(eventId);
+    $('#modalupdateForm input[name="name"]').val(eventName);
+    $('#modalupdateForm textarea[name="description"]').val(eventDescription);
   });
 </script>

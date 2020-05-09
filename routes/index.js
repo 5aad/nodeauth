@@ -16,6 +16,11 @@ router.get("/", ensureAuthenticated, async (req, res) =>
 
 //add event
 router.post("/addevent", ensureAuthenticated, eventController.addevent);
+router.post("/inviteevent", ensureAuthenticated, eventController.inviteevent);
+router.get("/updateInvite/:id", ensureAuthenticated, eventController.updateInvite);
+router.get("/updateDecline/:id", ensureAuthenticated, eventController.updateDecline);
+
+router.get("/inviteview", ensureAuthenticated, eventController.inviteview);
 //view event
 router.get("/dashboard", ensureAuthenticated, eventController.viewevent);
 //edit event
